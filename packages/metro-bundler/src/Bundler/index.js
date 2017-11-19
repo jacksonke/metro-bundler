@@ -29,6 +29,7 @@ const defaults = require('../defaults');
 const toLocalPath = require('../node-haste/lib/toLocalPath');
 
 const {generateAssetTransformResult, isAssetTypeAnImage} = require('./util');
+const SplitUtil = require('./SplitUtil');
 
 const {
   sep: pathSeparator,
@@ -150,6 +151,7 @@ type Options = {|
 |};
 
 const {hasOwnProperty} = Object;
+const _splitUtil = new SplitUtil();
 
 class Bundler {
   _opts: Options;
@@ -919,7 +921,8 @@ function verifyRootExists(root) {
 
 function createModuleIdFactory() {
   const fileToIdMap = Object.create(null);
-  let nextId = 0;
+  _splitUtil.fillCommonExport(fileToIdMap);
+  let nextId = _splitUtil.getBaseId();
   return ({path: modulePath}) => {
     if (!(modulePath in fileToIdMap)) {
       fileToIdMap[modulePath] = nextId;

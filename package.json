@@ -48,7 +48,8 @@
     "test-ci": "yarn run typecheck && yarn run lint && yarn run build && yarn run jest-coverage -- -i && node scripts/mapCoverage.js && codecov",
     "test": "yarn run typecheck && yarn run lint && yarn run build && yarn run jest",
     "typecheck": "flow check",
-    "watch": "yarn run build --silent && node ./scripts/watch.js"
+    "watch": "yarn run build --silent && node ./scripts/watch.js",
+    "ksy-copy":"rm -r ../naviApp/node_modules/metro-bundler/src/* && cp -r ./packages/metro-bundler/build/* ../naviApp/node_modules/metro-bundler/src"
   },
   "jest": {
     "modulePathIgnorePatterns": [

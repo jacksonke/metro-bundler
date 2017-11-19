@@ -24,6 +24,9 @@ const {createRamBundleGroups} = require('./util');
 const {fromRawMappings} = require('./source-map');
 const {isMappingsMap} = require('../lib/SourceMap');
 
+const SplitUtil = require('./SplitUtil');
+
+
 import type {IndexMap, MappingsMap, SourceMap} from '../lib/SourceMap';
 import type {GetSourceOptions, FinalizeOptions} from './BundleBase';
 
@@ -73,6 +76,8 @@ class Bundle extends BundleBase {
     this._numRequireCalls = 0;
     this._dev = dev;
     this._minify = minify;
+
+    this._splitUtil = new SplitUtil();
 
     this._ramGroups = ramGroups;
     this._ramBundle = null; // cached RAM Bundle
@@ -144,6 +149,9 @@ class Bundle extends BundleBase {
        * been set beforehand. */
       this._addRequireCall(this.getMainModuleId());
     }
+
+    // modify by jacksonke，记录相关信息
+    this._splitUtil.saveCommonExport(this.getModules());
 
     super.finalize(options);
   }

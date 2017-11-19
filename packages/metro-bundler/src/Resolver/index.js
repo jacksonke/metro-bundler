@@ -16,6 +16,7 @@ const DependencyGraph = require('../node-haste/DependencyGraph');
 
 const defaults = require('../defaults');
 const pathJoin = require('path').join;
+const SplitUtil = require('../Bundler/SplitUtil');
 
 import type ResolutionResponse from '../node-haste/DependencyGraph/ResolutionResponse';
 import type Module, {HasteImpl, TransformCode} from '../node-haste/Module';
@@ -60,6 +61,8 @@ type Options = {|
   +transformCode: TransformCode,
   +watch: boolean,
 |};
+
+const _splitUtil = new SplitUtil();
 
 class Resolver {
   _depGraph: DependencyGraph;
@@ -110,6 +113,7 @@ class Resolver {
     entryFile: string,
     transformOptions: JSTransformerOptions,
   ): Promise<Array<string>> {
+    // console.log(this._depGraph.getShallowDependencies(entryFile, transformOptions));
     return this._depGraph.getShallowDependencies(entryFile, transformOptions);
   }
 
@@ -193,6 +197,11 @@ class Resolver {
         }
       });
 
+      _splitUtil.addDepEntry(module.localPath, resolvedDeps);
+      // console.log("==============   Resolver");
+      // console.log(module.localPath);
+      // console.log(resolvedDeps);
+      
     // if we have a canonical ID for the module imported here,
     // we use it, so that require() is always called with the same
     // id for every module.

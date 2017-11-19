@@ -48,10 +48,12 @@ type ModuleMap = {[key: ModuleID]: ModuleDefinition};
 type RequireFn = (id: ModuleID | VerboseModuleNameForDev) => Exports;
 type VerboseModuleNameForDev = string;
 
+
 global.require = require;
 global.__d = define;
 
 const modules: ModuleMap = Object.create(null);
+
 if (__DEV__) {
   var verboseNamesToModuleIds: {[key: string]: number} = Object.create(null);
 }
@@ -131,10 +133,48 @@ function guardedLoadModule(moduleId: ModuleID, module) {
   }
 }
 
+// 返回 moduleId 所在的 chunkId
+// chunkId 从 1 开始
+// 当函数返回 0，表示该moduleId不在chunk当中
+function getChunkIDByModuleID(moduleId){
+
+  if (global.apfConfig === undefined){
+    console.log("global.apfConfig is undefined");
+    return 0;
+  }
+
+  let chunkID = global.apfConfig["" + moduleId];
+
+  if (typeof chunkID === 'number'){
+    console.log("chunkID is number");
+    return chunkID;
+  }
+  else {
+    console.log(chunkID);
+    console.log(global.apfConfig);
+    return 0;
+  }
+}
+
 function loadModuleImplementation(moduleId, module) {
+
+  console.log("loadModuleImplementation moduleId=" + moduleId);
+  
+  // jacksonke
+  // 先判断 moduleId 所在 chunk 是否已经加载
+  // 如果已经加载，就不需要下面的nativeRequire步骤了
   const nativeRequire = global.nativeRequire;
   if (!module && nativeRequire) {
-    nativeRequire(moduleId);
+    
+    let chunkId = getChunkIDByModuleID(moduleId);
+    if (chunkId != 0){
+      console.log("load chunk [" + chunkId + "] ...");
+      nativeRequire(chunkId);
+    }
+    else{
+      nativeRequire(moduleId);
+    }
+    
     module = modules[moduleId];
   }
 
